@@ -3,33 +3,28 @@ class piece {
     constructor(pos, grids) {
         this.x = pos[0]
         this.y = pos[1]
-        this.index = 0
+        this.rotationIndex = 0
         this.grids = grids
-        this.gridLength = this.grids.length
     }
 
-    moveLeft() {
-        
-    }
-
-    moveRight() {
-
-    }
-
-    softDrop() {
-
-    }
-
-    hardDrop() {
-
+    currentGrid() {
+        return this.grids[this.rotationIndex]
     }
 
     rotateLeft() {
-
+        if (this.rotationIndex > 0) {
+            this.rotationIndex--
+        } else {
+            this.rotationIndex = 3
+        }
     }
 
     rotateRight() {
-
+        if (this.rotationIndex < 3) {
+            this.rotationIndex++
+        } else {
+            this.rotationIndex = 0
+        }
     }
 }
 
@@ -37,12 +32,6 @@ export class I extends piece {
     constructor() {
         super([4, 20], [
             [
-                [0, 1, 0, 0],
-                [0, 1, 0, 0],
-                [0, 1, 0, 0],
-                [0, 1, 0, 0],
-            ],
-            [
                 [0, 0, 0, 0],
                 [1, 1, 1, 1],
                 [0, 0, 0, 0],
@@ -59,6 +48,12 @@ export class I extends piece {
                 [0, 0, 0, 0],
                 [1, 1, 1, 1],
                 [0, 0, 0, 0],
+            ],
+            [
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
             ],
         ])
     }
@@ -97,12 +92,6 @@ export class L extends piece {
     constructor() {
         super([4, 20], [
             [
-                [0, 0, 1, 0],
-                [1, 1, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-            ],
-            [
                 [0, 1, 0, 0],
                 [0, 1, 0, 0],
                 [0, 1, 1, 0],
@@ -118,6 +107,12 @@ export class L extends piece {
                 [1, 1, 0, 0],
                 [0, 1, 0, 0],
                 [0, 1, 0, 0],
+                [0, 0, 0, 0],
+            ],
+            [
+                [0, 0, 1, 0],
+                [1, 1, 1, 0],
+                [0, 0, 0, 0],
                 [0, 0, 0, 0],
             ],
         ])
@@ -127,12 +122,6 @@ export class J extends piece {
     constructor() {
         super([4, 20], [
             [
-                [1, 0, 0, 0],
-                [1, 1, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-            ],
-            [
                 [0, 1, 1, 0],
                 [0, 1, 0, 0],
                 [0, 1, 0, 0],
@@ -148,6 +137,12 @@ export class J extends piece {
                 [0, 1, 0, 0],
                 [0, 1, 0, 0],
                 [1, 1, 0, 0],
+                [0, 0, 0, 0],
+            ],
+            [
+                [1, 0, 0, 0],
+                [1, 1, 1, 0],
+                [0, 0, 0, 0],
                 [0, 0, 0, 0],
             ],
         ])
@@ -157,12 +152,6 @@ export class S extends piece {
     constructor() {
         super([4, 20], [
             [
-                [0, 1, 1, 0],
-                [1, 1, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-            ],
-            [
                 [0, 1, 0, 0],
                 [0, 1, 1, 0],
                 [0, 0, 1, 0],
@@ -178,6 +167,12 @@ export class S extends piece {
                 [1, 0, 0, 0],
                 [1, 1, 0, 0],
                 [0, 1, 0, 0],
+                [0, 0, 0, 0],
+            ],
+            [
+                [0, 1, 1, 0],
+                [1, 1, 0, 0],
+                [0, 0, 0, 0],
                 [0, 0, 0, 0],
             ],
         ])
@@ -187,12 +182,6 @@ export class Z extends piece {
     constructor() {
         super([4, 20], [
             [
-                [1, 1, 0, 0],
-                [0, 1, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-            ],
-            [
                 [0, 0, 1, 0],
                 [0, 1, 1, 0],
                 [0, 1, 0, 0],
@@ -208,6 +197,12 @@ export class Z extends piece {
                 [0, 1, 0, 0],
                 [1, 1, 0, 0],
                 [1, 0, 0, 0],
+                [0, 0, 0, 0],
+            ],
+            [
+                [1, 1, 0, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
                 [0, 0, 0, 0],
             ],
         ])
@@ -218,12 +213,6 @@ export class T extends piece {
         super([4, 20], [
             [
                 [0, 1, 0, 0],
-                [1, 1, 1, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-            ],
-            [
-                [0, 1, 0, 0],
                 [0, 1, 1, 0],
                 [0, 1, 0, 0],
                 [0, 0, 0, 0],
@@ -238,6 +227,12 @@ export class T extends piece {
                 [0, 1, 0, 0],
                 [1, 1, 0, 0],
                 [0, 1, 0, 0],
+                [0, 0, 0, 0],
+            ],
+            [
+                [0, 1, 0, 0],
+                [1, 1, 1, 0],
+                [0, 0, 0, 0],
                 [0, 0, 0, 0],
             ],
         ])
