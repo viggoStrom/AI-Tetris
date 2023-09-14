@@ -43,10 +43,15 @@ export class Tetris {
     }
 
     checkCollision() {
+        this.currentPiece.currentGrid().forEach(point => {
+            if (this.currentPiece.y + point[1] == 0) {
 
-
-        this.newPieceFlag = true
+                this.newPieceFlag = true
+                return
+            }
+        })
     }
+
 
     clearLineCheck() {
         this.linesClearedOnStep = 0
@@ -71,7 +76,7 @@ export class Tetris {
         // 
         switch (this.linesClearedOnStep) {
             case 0:
-                return;
+                return
             case 1:
                 this.score += 100 * this.level
                 break;
@@ -109,29 +114,31 @@ export class Tetris {
         }
         if (inputs[0] == 1) {
             // Move Left 
-            this.flag = true
-            this.currentPiece.currentGrid()[0].forEach(element => {
-                if (element == 1) {
-                    this.flag = false
-                    return
-                }
-            });
-            if (this.currentPiece.x > 2 && this.flag) {
-                this.currentPiece.x -= 1
-            }
+
+            // this.moveFlag = true
+            // this.currentPiece.currentGrid()[0].forEach(element => {
+            //     if (element == 1) {
+            //         this.moveFlag = false
+            //         return
+            //     }
+            // });
+            // if (this.currentPiece.x > 2 && this.moveFlag) {
+            //     this.currentPiece.x -= 1
+            // }
         }
         else if (inputs[1] == 1) {
             // Move Right
-            this.flag = true
-            this.currentPiece.currentGrid()[3].forEach(element => {
-                if (element == 1) {
-                    this.flag = false
-                    return
-                }
-            });
-            if (this.currentPiece.x < 9 && this.flag) {
-                this.currentPiece.x += 1
-            }
+
+            // this.moveFlag = true
+            // this.currentPiece.currentGrid()[3].forEach(element => {
+            //     if (element == 1) {
+            //         this.moveFlag = false
+            //         return
+            //     }
+            // });
+            // if (this.currentPiece.x < 9 && this.moveFlag) {
+            //     this.currentPiece.x += 1
+            // }
         }
         if (inputs[2] == 1) {
             // Soft Drop
@@ -142,7 +149,9 @@ export class Tetris {
         }
         else if (inputs[3] == 1) {
             // Hard Drop
-            this.currentPiece.y = 0
+            while (this.checkCollision()) {
+                this.currentPiece.y = 0
+            }
         }
 
         this.currentPiece.y -= 1
@@ -154,14 +163,34 @@ export class Tetris {
             this.nextPiece = this.generateRandomPiece();
         }
 
-        return [this.map, this.currentPiece, this.nextPiece, this.score, this.combo]
+        return [this.map, this.currentPiece, this.nextPiece, this.score, this.combo, this.level]
     }
 
     dispay() {
-        this.map.forEach(row => {
-            const rowNum = this.map.indexOf(row).toString().replace(/\b(\d)\b/g, " $1")
-            const string = `${rowNum}|${row[0]}${row[1]}${row[2]}${row[3]}${row[4]}${row[5]}${row[6]}${row[7]}${row[8]}${row[9]}`
-            console.log(string);
+
+        // Clone the map
+        this.projectedMap = JSON.parse(JSON.stringify(this.map))
+
+        // Place the active piece on the map
+        for (let index = 0; index < 4 /* Change for pentominoes */; index++) {
+            try {
+                const x = this.currentPiece.currentGrid()[index][0] + this.currentPiece.x
+                const y = this.currentPiece.currentGrid()[index][1] + this.currentPiece.y
+                this.projectedMap[y][x] = 1
+            } catch (error) { }
+        }
+
+        // Format each row of the map as a string
+        this.flippedMap = []
+        this.projectedMap.forEach(row => {
+            const rowNum = (this.projectedMap.indexOf(row) + 1).toString().replace(/\b(\d)\b/g, " $1")
+            const rowString = `|${row[0]}${row[1]}${row[2]}${row[3]}${row[4]}${row[5]}${row[6]}${row[7]}${row[8]}${row[9]}`
+            this.flippedMap.unshift(rowNum + rowString.replaceAll("0", "▯").replaceAll("1", "▮"))
+        })
+
+        // Print the formatted strings in reverse order compared to the projected map
+        this.flippedMap.forEach(row => {
+            console.log(row);
         })
     }
 }
