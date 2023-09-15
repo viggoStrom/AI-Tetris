@@ -5,8 +5,10 @@ import { Tetris } from "./src/game.js"
 const tetris = new Tetris()
 
 
-const game = setInterval(() => {
-    console.clear()
-    tetris.step([0, 0, 0, 0, 0, 0])
-    tetris.dispay()
-}, 500);
+// const game = setInterval(() => {
+//     console.clear()
+//     console.log(tetris.step([1, 0, 0, 0, 1, 0]));
+//     tetris.dispay()
+// }, 200);
+
+

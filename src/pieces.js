@@ -10,22 +10,6 @@ class piece {
     currentGrid() {
         return this.grids[this.rotationIndex]
     }
-
-    rotateLeft() {
-        if (this.rotationIndex > 0) {
-            this.rotationIndex = this.rotationIndex - 1
-        } else {
-            this.rotationIndex = 3
-        }
-    }
-
-    rotateRight() {
-        if (this.rotationIndex < 3) {
-            this.rotationIndex = this.rotationIndex + 1
-        } else {
-            this.rotationIndex = 0
-        }
-    }
 }
 
 export class I extends piece {
