@@ -1,5 +1,6 @@
 
 import { I, O, L, J, S, Z, T } from "./pieces.js"
+import * as tf from "@tensorflow/tfjs"
 
 export class Tetris {
     constructor() {
@@ -25,6 +26,7 @@ export class Tetris {
         this.level = 1
         this.combo = 0
         this.linesCleared = 0
+        this.hasLost = false
     }
 
     generateRandomPiece() {
@@ -41,7 +43,7 @@ export class Tetris {
     checkLose() {
         if (this.map[19].includes(1)) {
             console.log("Lose");
-            process.exit()
+            this.hasLost = true
         }
     }
 
@@ -150,10 +152,26 @@ export class Tetris {
 
         this.currentPiece.y--
         this.checkCollision()
-
-
-        return [this.map, this.currentPiece, this.nextPiece, this.score, this.combo, this.level]
     }
+
+    getState() {
+        this.projectedMap = JSON.parse(JSON.stringify(this.map))
+
+        for (let index = 0; index < 4 /* Change for pentominoes */; index++) {
+            try {
+                const x = this.currentPiece.currentGrid()[index][0] + this.currentPiece.x
+                const y = this.currentPiece.currentGrid()[index][1] + this.currentPiece.y
+                this.projectedMap[y][x] = 1
+            } catch (error) { }
+        }
+        return [this.projectedMap, this.score, this.level]
+        
+        // const gameState = [this.map]; // Wrap the map in an array
+        // const batchSize = 1; // Assuming batch size 1
+        // const inputShape = [batchSize, 20, 10];
+        // const reshapedState = tf.tensor(gameState, inputShape);
+        // return reshapedState;
+    }    
 
     hardDrop() {
         let i = 0
@@ -225,7 +243,7 @@ export class Tetris {
 
             this.currentPiece.rotationIndex = 3
         }
-        
+
         this.checkCollision()
     }
 
