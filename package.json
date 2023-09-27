@@ -11,6 +11,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@tensorflow/tfjs": "^4.10.0"
+    "uuid": "^9.0.1"
   }
 }

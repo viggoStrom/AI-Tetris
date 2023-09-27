@@ -164,7 +164,7 @@ export class Tetris {
                 this.projectedMap[y][x] = 1
             } catch (error) { }
         }
-        return [this.projectedMap, this.score, this.level]
+        return this.projectedMap
         
         // const gameState = [this.map]; // Wrap the map in an array
         // const batchSize = 1; // Assuming batch size 1

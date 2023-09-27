@@ -1,25 +1,17 @@
 
-// import * as tf from "@tensorflow/tfjs"
 import { Tetris } from "./src/game.js"
+// import ReImprove from "./node_modules/reimprovejs"
+import * as tf from "@tensorflow/tfjs";
+
 
 const tetris = new Tetris()
-
-
-// const game = setInterval(() => {
-//     console.clear()
-//     console.log(tetris.step([1, 0, 0, 0, 1, 0]));
-//     tetris.dispay()
-// }, 200);
-
-
-import * as tf from "@tensorflow/tfjs";
 
 const numEpisodes = 10;
 
 // Create the RL agent
 const model = tf.sequential();
 // Add layers to your neural network model, e.g., dense layers
-model.add(tf.layers.dense({ units: 64, activation: 'relu', inputShape: [3, 20, 10] }));
+model.add(tf.layers.dense({ units: 64, activation: 'relu', inputShape: [20,10] }));
 model.add(tf.layers.dense({ units: 6, activation: 'softmax' }));
 
 // Compile the model
@@ -32,19 +24,12 @@ async function train() {
 
         while (!tetris.hasLost) {
             // Get the current state from the environment
-            const gameState = tetris.getState();
-
-            // Add score and level to the game state array
-            const gameStateWithScoreAndLevel = [
-                gameState[0], // The game map (20x10 grid)
-                gameState[1], // The score
-                gameState[2]  // The level
-            ];
+            const gameState = tf.tensor(tetris.getState());
 
             // Reshape the data to match the expected input shape
             const batchSize = 1; // Assuming one game state
-            const inputShape = [batchSize, 20, 10];
-            const state = tf.tensor([gameStateWithScoreAndLevel], inputShape);
+            const inputShape = [gameState];
+            const state = tf.tensor(inputShape);
 
             const actionProbabilities = model.predict(state);
             const action = tf.multinomial(actionProbabilities, 3)
@@ -62,7 +47,7 @@ async function train() {
             const replayBufferSize = 1000
 
             const experience = {
-                state: gameStateWithScoreAndLevel, // The current state
+                state: gameState, // The current state
                 action: inputArray, // The action taken
                 reward: tetris.score,
                 nextState: tf.tensor([tetris.getState()], [batchSize, 20, 10]),
