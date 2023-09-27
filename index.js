@@ -11,7 +11,7 @@ const numEpisodes = 10;
 // Create the RL agent
 const model = tf.sequential();
 // Add layers to your neural network model, e.g., dense layers
-model.add(tf.layers.dense({ units: 64, activation: 'relu', inputShape: [20,10] }));
+model.add(tf.layers.dense({ units: 200, activation: 'relu', inputShape: [20, 10] }));
 model.add(tf.layers.dense({ units: 6, activation: 'softmax' }));
 
 // Compile the model
@@ -24,7 +24,7 @@ async function train() {
 
         while (!tetris.hasLost) {
             // Get the current state from the environment
-            const gameState = tf.tensor(tetris.getState());
+            const gameState = tetris.getState();
 
             // Reshape the data to match the expected input shape
             const batchSize = 1; // Assuming one game state
@@ -32,7 +32,7 @@ async function train() {
             const state = tf.tensor(inputShape);
 
             const actionProbabilities = model.predict(state);
-            const action = tf.multinomial(actionProbabilities, 3)
+            const action = tf.multinomial(actionProbabilities, 2) // TODO
             const actionValue = action.dataSync();
 
             const inputArray = [0, 0, 0, 0, 0, 0]
