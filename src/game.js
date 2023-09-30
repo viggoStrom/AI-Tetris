@@ -165,12 +165,6 @@ export class Tetris {
             } catch (error) { }
         }
         return this.projectedMap
-        
-        // const gameState = [this.map]; // Wrap the map in an array
-        // const batchSize = 1; // Assuming batch size 1
-        // const inputShape = [batchSize, 20, 10];
-        // const reshapedState = tf.tensor(gameState, inputShape);
-        // return reshapedState;
     }    
 
     hardDrop() {
