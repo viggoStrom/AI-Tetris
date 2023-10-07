@@ -23,6 +23,7 @@ export class Tetris {
         this.currentPiece = this.generateRandomPiece()
         this.nextPiece = this.generateRandomPiece()
         this.score = 0
+        this.scoreThisMove = 0
         this.level = 1
         this.combo = 0
         this.linesCleared = 0
@@ -42,7 +43,7 @@ export class Tetris {
 
     checkLose() {
         if (this.map[19].includes(1)) {
-            console.log("Lose");
+            console.log("Game Over,", "Top layer:\n", this.map[19].toString().replace(" ", ""));
             this.hasLost = true
         }
     }
@@ -102,25 +103,29 @@ export class Tetris {
         // Tetris row score = 800 * level
         // Combo: + 50 * combo count * level
 
+        this.scoreThisMove = 0
+
         switch (this.linesClearedOnStep) {
             case 0:
                 return
             case 1:
-                this.score += 100 * this.level
+                this.scoreThisMove += 100 * this.level
                 break;
             case 2:
-                this.score += 300 * this.level
+                this.scoreThisMove += 300 * this.level
                 break;
             case 3:
-                this.score += 500 * this.level
+                this.scoreThisMove += 500 * this.level
                 break;
             case 4:
-                this.score += 800 * this.level
+                this.scoreThisMove += 800 * this.level
                 break;
             default:
                 break;
         }
         // Combo will come later
+
+        this.score += this.scoreThisMove
 
         this.linesCleared += this.linesClearedOnStep
 
@@ -154,7 +159,12 @@ export class Tetris {
         this.checkCollision()
     }
 
-    getState() {
+    getState(input = false) {
+
+        if (input) {
+            this.step(input)
+        }
+
         this.projectedMap = JSON.parse(JSON.stringify(this.map))
 
         for (let index = 0; index < 4 /* Change for pentominoes */; index++) {
@@ -164,8 +174,8 @@ export class Tetris {
                 this.projectedMap[y][x] = 1
             } catch (error) { }
         }
-        return this.projectedMap
-    }    
+        return [this.projectedMap.flat(), this.scoreThisMove]
+    }
 
     hardDrop() {
         let i = 0
@@ -270,7 +280,7 @@ export class Tetris {
         this.checkCollision()
     }
 
-    dispay() {
+    display(clg = true) {
 
         // Clone the map
         this.projectedMap = JSON.parse(JSON.stringify(this.map))
@@ -293,8 +303,13 @@ export class Tetris {
         })
 
         // Print the formatted strings in reverse order compared to the projected map
-        this.flippedMap.forEach(row => {
-            console.log(row);
-        })
+        if (clg) {
+            this.flippedMap.forEach(row => {
+                console.log(row);
+            })
+            console.log("");
+        }
+
+        return [this.flippedMap, this.currentPiece]
     }
 }
