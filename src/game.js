@@ -1,6 +1,8 @@
 
 import { I, O, L, J, S, Z, T } from "./pieces.js"
 import * as tf from "@tensorflow/tfjs"
+import { random } from "./utils.js";
+
 
 export class Tetris {
     constructor() {
@@ -28,11 +30,15 @@ export class Tetris {
         this.combo = 0
         this.linesCleared = 0
         this.hasLost = false
+        this.seed
     }
 
     generateRandomPiece() {
         const pieces = [I, O, L, J, S, Z, T]
-        const piece = new pieces[Math.floor(Math.random() * 7)]
+        const [randomIndex, seed] = random(7, true)
+        this.seed = seed
+        const piece = new pieces[parseInt(randomIndex)]
+        console.log(piece.x, piece.y);
         return piece
     }
 
@@ -78,19 +84,23 @@ export class Tetris {
             } catch (error) { }
         })
 
+        this.clearLineCheck()
+
         return true
     }
 
     clearLineCheck() {
 
         this.linesClearedOnStep = 0
-        this.map.forEach(row => {
+        this.map.forEach((row, index) => {
             this.rowSum = 0
             row.forEach(cell => {
-                rowSum += cell
+                this.rowSum += cell
             })
-            if (rowSum >= 10) {
+            if (this.rowSum >= 10) {
                 this.linesClearedOnStep++
+                this.map.splice(index, 1)
+                this.map.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             }
         })
 
@@ -280,7 +290,7 @@ export class Tetris {
         this.checkCollision()
     }
 
-    display(clg = true) {
+    display(shouldClg = true) {
 
         // Clone the map
         this.projectedMap = JSON.parse(JSON.stringify(this.map))
@@ -294,6 +304,12 @@ export class Tetris {
             } catch (error) { }
         }
 
+        // DEBUG
+        this.projectedMap.reverse().forEach((row, index) => {
+            console.log(" ", row.toString(), "\t", index);
+        })
+        this.projectedMap.reverse()
+
         // Format each row of the map as a string
         this.flippedMap = []
         this.projectedMap.forEach(row => {
@@ -303,7 +319,7 @@ export class Tetris {
         })
 
         // Print the formatted strings in reverse order compared to the projected map
-        if (clg) {
+        if (shouldClg) {
             this.flippedMap.forEach(row => {
                 console.log(row);
             })

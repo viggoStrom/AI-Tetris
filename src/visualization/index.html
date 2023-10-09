@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris Visualization</title>
+</head>
+
+<body style="
+    background-color: #343434;
+    color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    font-size: 2rem;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    ">
+    <h1 style="margin-top: 2vh;">TETRIS Visualizer</h1>
+
+    <div style="
+        display: flex;
+        ">
+
+        <div id="map" style="
+            display: grid;
+            grid-template-columns: repeat(10, auto);
+            grid-template-rows: repeat(20, auto);
+            width: 45vh;
+            height: 90vh;
+            background-color: #505050;
+            padding: 1vw;
+            margin-bottom: 4vh;
+            ">
+        </div>
+
+        <div style="
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            justify-content: center;
+            margin-left: 5vw;
+            ">
+            <p>Input</p>
+            <div style="display: flex;">
+                <div style="position: relative;"><img src="icons/arrow_back_FILL0_wght400_GRAD0_opsz24.png"      style="pointer-events: none;                        position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="ML"><input style="height: 2rem; width: 2rem;" type="checkbox" name="" id=""></div>
+                <div style="position: relative;"><img src="icons/arrow_back_FILL0_wght400_GRAD0_opsz24.png"      style="pointer-events: none; transform: scaleX(-1); position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="MR"><input style="height: 2rem; width: 2rem;" type="checkbox" name="" id=""></div>
+                <div style="position: relative;"><img src="icons/arrow_drop_down_FILL0_wght400_GRAD0_opsz24.png" style="pointer-events: none;                        position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="SD"><input style="height: 2rem; width: 2rem;" type="checkbox" name="" id=""></div>
+                <div style="position: relative;"><img src="icons/arrow_forward_FILL0_wght400_GRAD0_opsz24.png"   style="pointer-events: none;                        position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="HD"><input style="height: 2rem; width: 2rem;" type="checkbox" name="" id=""></div>
+                <div style="position: relative;"><img src="icons/refresh_FILL0_wght400_GRAD0_opsz24.png"         style="pointer-events: none; transform: scaleX(-1); position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="RL"><input style="height: 2rem; width: 2rem;" type="checkbox" name="" id=""></div>
+                <div style="position: relative;"><img src="icons/refresh_FILL0_wght400_GRAD0_opsz24.png"         style="pointer-events: none;                        position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="RR"><input style="height: 2rem; width: 2rem;" type="checkbox" name="" id=""></div>
+            </div>
+            <button onclick="submit()" style="height: 2rem; width: 6vw; font-size: large; font-family: inherit; border-radius: 1vw; margin-top: 1rem;">Step</button>
+        </div>
+    </div>
+
+    <script src="dataFetcher.js"></script>
+</body>
+
+</html>
