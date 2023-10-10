@@ -187,6 +187,7 @@ export class Tetris {
         return [this.projectedMap.flat(), this.scoreThisMove]
     }
 
+    // TODO buggy!! Spawns new pieces at the wrong place
     hardDrop() {
         let i = 0
         while (this.checkCollision() && i < 20) {

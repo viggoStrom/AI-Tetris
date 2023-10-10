@@ -282,4 +282,25 @@ class Logger {
 
 const debugGame = new Tetris()
 
-browserCommunications(debugGame).then(response => { console.log(response); })
+import express from "express"
+import cors from "cors"
+
+const app = express()
+const port = 3000
+
+app.use(cors({ origin: "http://127.0.0.1:5500" }))
+
+app.get('/send/:input', async (req, res) => {
+    const input = req.params.input.split(",")
+
+    debugGame.step(input)
+    debugGame.display()
+    const [projectedMap, _] = debugGame.getState()
+    debugGame.projectedMap = projectedMap
+
+    res.json(debugGame)
+})
+
+app.listen(port, () => {
+    console.log("Listening on port", port);
+})
