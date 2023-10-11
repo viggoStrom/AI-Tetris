@@ -22,8 +22,10 @@ export class Tetris {
         // 0x     10x
         // 
 
-        this.currentPiece = this.generateRandomPiece()
-        this.nextPiece = this.generateRandomPiece()
+        this.currentPiece = new O()
+        this.nextPiece = new O()
+        // this.currentPiece = this.generateRandomPiece()
+        // this.nextPiece = this.generateRandomPiece()
         this.score = 0
         this.scoreThisMove = 0
         this.level = 1
@@ -38,13 +40,13 @@ export class Tetris {
         const [randomIndex, seed] = random(7, true)
         this.seed = seed
         const piece = new pieces[parseInt(randomIndex)]
-        console.log(piece.x, piece.y);
         return piece
     }
 
     setNewPiece() {
         this.currentPiece = this.nextPiece;
-        this.nextPiece = this.generateRandomPiece();
+        this.nextPiece = new O()
+        // this.nextPiece = this.generateRandomPiece();
     }
 
     checkLose() {
@@ -71,34 +73,34 @@ export class Tetris {
                     this.map[y][x] == 1
                 ) {
 
-                    currentGrid.forEach(hardPoint => {
+                    currentGrid.forEach(cellInPiece => {
 
-                        const x = this.currentPiece.x + hardPoint[0]
-                        const y = this.currentPiece.y + hardPoint[1] + 1
+                        const x = this.currentPiece.x + cellInPiece[0]
+                        const y = this.currentPiece.y + cellInPiece[1] + 1
                         this.map[y][x] = 1
 
                     })
+                    this.clearLineCheck()
                     this.setNewPiece();
                     return false
                 }
-            } catch (error) { }
+            } catch (_) { }
         })
 
         this.clearLineCheck()
-
         return true
     }
 
     clearLineCheck() {
 
-        this.linesClearedOnStep = 0
+        let linesClearedOnStep = 0
         this.map.forEach((row, index) => {
             this.rowSum = 0
             row.forEach(cell => {
                 this.rowSum += cell
             })
             if (this.rowSum >= 10) {
-                this.linesClearedOnStep++
+                linesClearedOnStep++
                 this.map.splice(index, 1)
                 this.map.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             }
@@ -113,31 +115,31 @@ export class Tetris {
         // Tetris row score = 800 * level
         // Combo: + 50 * combo count * level
 
-        this.scoreThisMove = 0
+        let scoreThisMove = 0
 
-        switch (this.linesClearedOnStep) {
+        switch (linesClearedOnStep) {
             case 0:
                 return
             case 1:
-                this.scoreThisMove += 100 * this.level
+                scoreThisMove += 100 * this.level
                 break;
             case 2:
-                this.scoreThisMove += 300 * this.level
+                scoreThisMove += 300 * this.level
                 break;
             case 3:
-                this.scoreThisMove += 500 * this.level
+                scoreThisMove += 500 * this.level
                 break;
             case 4:
-                this.scoreThisMove += 800 * this.level
+                scoreThisMove += 800 * this.level
                 break;
             default:
                 break;
         }
         // Combo will come later
 
-        this.score += this.scoreThisMove
+        this.score += scoreThisMove
 
-        this.linesCleared += this.linesClearedOnStep
+        this.linesCleared += linesClearedOnStep
 
         if (this.linesCleared > 10 * this.level) {
             this.level++
@@ -145,6 +147,10 @@ export class Tetris {
     }
 
     step(inputs) {
+        if (this.hasLost) {
+            console.log("!LOST!");
+            return
+        }
 
         if (inputs[4] == 1 && this.checkCollision()) {
             this.rotateLeft();
@@ -204,31 +210,31 @@ export class Tetris {
     }
 
     moveRight() {
-        this.moveFlag = true;
+        let doMove = true;
 
         this.currentPiece.currentGrid().forEach(point => {
             if (point[0] + this.currentPiece.x >= 9) {
-                this.moveFlag = false;
+                doMove = false;
                 return;
             }
         });
 
-        if (this.moveFlag) {
+        if (doMove) {
             this.currentPiece.x++;
         }
     }
 
     moveLeft() {
-        this.moveFlag = true;
+        let doMove = true;
 
         this.currentPiece.currentGrid().forEach(point => {
             if (point[0] + this.currentPiece.x <= 0) {
-                this.moveFlag = false;
+                doMove = false;
                 return;
             }
         });
 
-        if (this.moveFlag) {
+        if (doMove) {
             this.currentPiece.x--;
         }
     }

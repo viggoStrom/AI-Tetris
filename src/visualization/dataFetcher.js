@@ -1,22 +1,7 @@
 
 const map = document.getElementById("map")
-const inputs = document.querySelectorAll("div input[type=checkbox]")
 
-const updateCheckbox = () => {
-    const input = []
-    inputs.forEach(checkbox => {
-        input.push(checkbox.checked ? 1 : 0)
-    })
-    localStorage.setItem("checkboxes", JSON.stringify(input))
-}
-
-
-const fetchGame = async () => {
-    const input = []
-    inputs.forEach(checkbox => {
-        input.push(checkbox.checked ? 1 : 0)
-    })
-
+const fetchGame = async (input) => {
     fetch(`http://localhost:3000/send/${input}`).then(response => {
         response.json().then(response => {
 
@@ -24,17 +9,34 @@ const fetchGame = async () => {
                 // Clear Map
                 map.innerHTML = ""
 
+                // Flip and mirror the map
                 const modifiedMap = []
                 for (let index = 0; index < 200; index += 10) {
                     modifiedMap.push(response.projectedMap.slice(index, index + 10))
                 }
                 const flatMap = modifiedMap.reverse().flat()
 
+                // Create nice looking squares
                 flatMap.forEach(cell => {
-                    const node = document.createElement("div")
-                    node.style.backgroundColor = cell === 1 ? "white" : "black"
-                    map.appendChild(node)
+                    const outline = document.createElement("div")
+                    outline.style.backgroundColor = "black"
+
+                    if (cell) {
+                        const infill = document.createElement("div")
+                        infill.style.backgroundColor = "white"
+                        infill.style.width = "95%"
+                        infill.style.marginLeft = "2.5%"
+                        infill.style.height = "95%"
+                        infill.style.marginTop = "2.5%"
+
+                        outline.appendChild(infill)
+                    }
+
+                    map.appendChild(outline)
                 });
+
+                const scoreSpan = document.getElementById("score")
+                scoreSpan.innerHTML = response.score
             } else {
                 map.innerHTML = ""
                 for (let index = 0; index < 200; index++) {
@@ -44,24 +46,17 @@ const fetchGame = async () => {
                     map.appendChild(node)
                 }
 
-                const endScreen = [12, 21, 31, 41, 51, 62, 63, 13, 44, 54, 43, 36, 26, 17, 28, 38, 141, 132, 123, 124, 125, 126, 137, 148, 92, 102, 97, 107]
+                const endScreen = [103, 104, 105, 106, 112, 117, 121, 128, 72, 77, 82, 87]
 
-                endScreen.forEach(index => {
-                    map.children[index].style.backgroundColor = "white"
+                endScreen.forEach(cellIndex => {
+                    map.children[cellIndex].style.backgroundColor = "white"
                 })
             }
         });
     })
 }
-fetchGame()
+fetchGame([0, 0, 0, 0, 0, 0])
 
 const submit = () => {
-    fetchGame()
-}
-
-
-window.onload = (event) => {
-    JSON.parse(localStorage.getItem("checkboxes")).forEach((checkbox, index) => {
-        inputs[index].checked = checkbox === 1 ? true : false
-    })
+    fetchGame([0, 0, 0, 0, 0, 0])
 }
