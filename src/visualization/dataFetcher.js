@@ -60,3 +60,54 @@ fetchGame([0, 0, 0, 0, 0, 0])
 const submit = () => {
     fetchGame([0, 0, 0, 0, 0, 0])
 }
+
+const keypress = (event) => {
+    switch (event.key) {
+        case " ":
+            event.preventDefault()
+            fetchGame([0, 0, 0, 0, 0, 0])
+            break;
+
+        case "a":
+        case "ArrowLeft":
+            event.preventDefault()
+            fetchGame([1, 0, 0, 0, 0, 0])
+            break;
+
+        case "d":
+        case "ArrowRight":
+            event.preventDefault()
+            fetchGame([0, 1, 0, 0, 0, 0])
+            break;
+
+        case "s":
+        case "ArrowDown":
+            event.preventDefault()
+            fetchGame([0, 0, 1, 0, 0, 0])
+            break;
+
+        case "q":
+        case "z":
+            fetchGame([0, 0, 0, 0, 1, 0])
+            break;
+
+        case "e":
+        case "c":
+            fetchGame([0, 0, 0, 0, 0, 1])
+            break;
+
+        case "Enter":
+            event.preventDefault()
+            fetchGame([0, 0, 0, 1, 0, 0])
+            break;
+
+        case "ArrowUp":
+            event.preventDefault()
+            break;
+
+        default:
+            break;
+    }
+}
+
+document.addEventListener("keydown", keypress)

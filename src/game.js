@@ -32,13 +32,11 @@ export class Tetris {
         this.combo = 0
         this.linesCleared = 0
         this.hasLost = false
-        this.seed
     }
 
     generateRandomPiece() {
         const pieces = [I, O, L, J, S, Z, T]
         const [randomIndex, seed] = random(7, true)
-        this.seed = seed
         const piece = new pieces[parseInt(randomIndex)]
         return piece
     }
@@ -139,6 +137,7 @@ export class Tetris {
 
         this.score += scoreThisMove
 
+        console.log(linesClearedOnStep);
         this.linesCleared += linesClearedOnStep
 
         if (this.linesCleared > 10 * this.level) {
@@ -193,10 +192,23 @@ export class Tetris {
         return [this.projectedMap.flat(), this.scoreThisMove]
     }
 
-    // TODO buggy!! Spawns new pieces at the wrong place
     hardDrop() {
         let i = 0
-        while (this.checkCollision() && i < 20) {
+        const initialY = this.currentPiece.y
+        const columnIndex = this.currentPiece.x
+
+        let depth = 0
+        this.map.forEach(row => {
+            if (row[columnIndex] == 0) {
+                depth += 1
+            } else {
+                return
+            }
+        })
+        depth -= initialY
+
+        // It shoves the next piece down even though thats not desireable
+        while (this.checkCollision() && i < depth) {
             this.currentPiece.y--;
             i++
         }
@@ -213,7 +225,11 @@ export class Tetris {
         let doMove = true;
 
         this.currentPiece.currentGrid().forEach(point => {
-            if (point[0] + this.currentPiece.x >= 9) {
+            const x = point[0] + this.currentPiece.x
+            const y = point[1] + this.currentPiece.y
+            const neighbor = this.map[y][x + 1]
+
+            if (point[0] + this.currentPiece.x >= 9 || neighbor === 1) {
                 doMove = false;
                 return;
             }
@@ -228,7 +244,11 @@ export class Tetris {
         let doMove = true;
 
         this.currentPiece.currentGrid().forEach(point => {
-            if (point[0] + this.currentPiece.x <= 0) {
+            const x = point[0] + this.currentPiece.x
+            const y = point[1] + this.currentPiece.y
+            const neighbor = this.map[y][x - 1]
+
+            if (x <= 0 || neighbor === 1) {
                 doMove = false;
                 return;
             }
