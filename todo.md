@@ -1,4 +1,8 @@
+TODO
 
 - hard drop
-- Lateral movement clipping
+
+DONE
+- Lateral movement clipping (test every shape)
 - score
+

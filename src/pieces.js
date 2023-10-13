@@ -14,7 +14,7 @@ class piece {
 
 export class I extends piece {
     constructor() {
-        super([3, 18], [
+        super([3, 19], [
             [[2, 0], [2, 1], [2, 2], [2, 3]],
             [[0, 2], [1, 2], [2, 2], [3, 2]],
             [[1, 0], [1, 1], [1, 2], [1, 3]],
@@ -24,7 +24,7 @@ export class I extends piece {
 }
 export class O extends piece {
     constructor() {
-        super([3, 17], [
+        super([3, 18], [
             [[1, 1], [2, 1], [1, 2], [2, 2]],
             [[1, 1], [2, 1], [1, 2], [2, 2]],
             [[1, 1], [2, 1], [1, 2], [2, 2]],
@@ -34,7 +34,7 @@ export class O extends piece {
 }
 export class L extends piece {
     constructor() {
-        super([3, 18], [
+        super([3, 19], [
             [[1, 0], [1, 1], [1, 2], [2, 2]],
             [[0, 1], [1, 1], [2, 1], [0, 2]],
             [[0, 0], [1, 0], [1, 1], [1, 2]],
@@ -44,7 +44,7 @@ export class L extends piece {
 }
 export class J extends piece {
     constructor() {
-        super([3, 18], [
+        super([3, 19], [
             [[1, 0], [2, 0], [1, 1], [1, 2]],
             [[0, 1], [1, 1], [2, 1], [2, 2]],
             [[1, 0], [1, 1], [0, 2], [1, 2]],
@@ -54,7 +54,7 @@ export class J extends piece {
 }
 export class S extends piece {
     constructor() {
-        super([3, 18], [
+        super([3, 19], [
             [[1, 0], [1, 1], [2, 1], [2, 2]],
             [[1, 1], [2, 1], [0, 2], [1, 2]],
             [[0, 0], [0, 1], [1, 1], [1, 2]],
@@ -64,7 +64,7 @@ export class S extends piece {
 }
 export class Z extends piece {
     constructor() {
-        super([3, 18], [
+        super([3, 19], [
             [[2, 0], [1, 1], [2, 1], [1, 2]],
             [[0, 1], [1, 1], [1, 2], [2, 2]],
             [[1, 0], [0, 1], [1, 1], [0, 2]],
@@ -75,7 +75,7 @@ export class Z extends piece {
 }
 export class T extends piece {
     constructor() {
-        super([3, 18], [
+        super([3, 19], [
             [[1, 0], [1, 1], [2, 1], [1, 2]],
             [[0, 1], [1, 1], [2, 1], [1, 2]],
             [[1, 0], [0, 1], [1, 1], [1, 2]],

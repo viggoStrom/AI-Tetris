@@ -1,5 +1,8 @@
 import crypto from "crypto"
 import fs from "fs";
+import express from "express"
+import cors from "cors"
+
 
 export const random = (max = 1, returnSeed = false, parseSeed = 0) => {
     const seed = parseSeed === 0 ? crypto.randomBytes(32) : parseSeed
@@ -11,20 +14,98 @@ export const random = (max = 1, returnSeed = false, parseSeed = 0) => {
 }
 
 
-export const browserCommunications = async (game) => {
-    const filePath = "./src/visualization/transfer.json"
+export class Logger {
+    constructor() {
+        this.dir = `./logs/${Date.now()}`
+        fs.promises.mkdir(this.dir)
 
-    const response = {}
+        this.gameReplayDir = `${this.dir}/replay.txt`
+        fs.promises.writeFile(this.gameReplayDir, "")
 
-    fs.promises.readFile(filePath).then(data => {
-        response.input = JSON.parse(data).input
-    })
+        this.rawReplayDir = `${this.dir}/rawReplay.csv`
+        fs.promises.writeFile(this.rawReplayDir, "")
+    }
 
-    response.map = game.map
-    response.currentPiece = game.currentPiece
-    response.nextPiece = game.nextPiece
+    saveNetwork(network) {
+        fs.promises.writeFile(`${this.dir}/model.json`, JSON.stringify(network))
 
-    fs.promises.writeFile(filePath, JSON.stringify(response))
+        const comms = new browserCommunications(this.rawReplayDir)
+    }
 
-    return response.input
+    state(game) {
+        const [map, piece] = game.display(false)
+        let formattedString = ""
+        map.forEach(row => {
+            formattedString += row + "\n"
+        })
+        formattedString += "\n"
+        const grid = [
+            ["▯", "▯", "▯", "▯"],
+            ["▯", "▯", "▯", "▯"],
+            ["▯", "▯", "▯", "▯"],
+            ["▯", "▯", "▯", "▯"],
+        ]
+        grid[piece.currentGrid()[0][1]][piece.currentGrid()[0][0]] = "▮"
+        grid[piece.currentGrid()[1][1]][piece.currentGrid()[1][0]] = "▮"
+        grid[piece.currentGrid()[2][1]][piece.currentGrid()[2][0]] = "▮"
+        grid[piece.currentGrid()[3][1]][piece.currentGrid()[3][0]] = "▮"
+        grid[0][3] += "\n"
+        grid[1][3] += "\n"
+        grid[2][3] += "\n"
+        grid[3][3] += "\n"
+        formattedString += "Active piece:\n"
+        formattedString += grid.reverse().toString().replaceAll(",", "")
+        formattedString += "\n"
+        formattedString += "\n"
+
+        fs.promises.appendFile(this.gameReplayDir, formattedString)
+
+        this.saveRaw(game)
+    }
+
+    saveRaw(game) {
+        const map = game.map
+        let formattedString = ""
+        map.forEach(row => {
+            formattedString += row.toString().replaceAll("[").replaceAll("]") + ",\n"
+        })
+
+        fs.promises.appendFile(this.rawReplayDir, formattedString)
+    }
 }
+
+
+export class browserCommunications {
+    constructor(dir) {
+        this.app = express()
+        this.port = 3000
+
+        this.app.use(cors({ origin: "http://127.0.0.1:5500" }))
+        this.app.listen(this.port, () => {
+            console.log("Listening on port", this.port);
+        })
+        this.app.get('/ask', async (req, res) => {
+            fs.promises.readFile(dir, "utf-8").then(file => {
+                console.log("Sent replay to client");
+                res.json(file)
+            })
+        })
+    }
+
+    replay() {
+    }
+
+    // send() {
+    //     this.app.get('/send/:input', async (req, res) => {
+    //         const input = req.params.input.split(",")
+
+    //         this.game.step(input)
+    //         const [projectedMap, _] = this.game.getState()
+    //         this.game.projectedMap = projectedMap
+
+    //         res.json(this.game)
+    //     })
+
+    // }
+}
+

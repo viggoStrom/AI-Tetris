@@ -22,10 +22,8 @@ export class Tetris {
         // 0x     10x
         // 
 
-        this.currentPiece = new O()
-        this.nextPiece = new O()
-        // this.currentPiece = this.generateRandomPiece()
-        // this.nextPiece = this.generateRandomPiece()
+        this.currentPiece = this.generateRandomPiece()
+        this.nextPiece = this.generateRandomPiece()
         this.score = 0
         this.scoreThisMove = 0
         this.level = 1
@@ -43,8 +41,7 @@ export class Tetris {
 
     setNewPiece() {
         this.currentPiece = this.nextPiece;
-        this.nextPiece = new O()
-        // this.nextPiece = this.generateRandomPiece();
+        this.nextPiece = this.generateRandomPiece();
     }
 
     checkLose() {
@@ -90,20 +87,23 @@ export class Tetris {
     }
 
     clearLineCheck() {
-
-        let linesClearedOnStep = 0
         this.map.forEach((row, index) => {
+
             this.rowSum = 0
             row.forEach(cell => {
                 this.rowSum += cell
             })
             if (this.rowSum >= 10) {
-                linesClearedOnStep++
+                console.log("clear!");
+                this.linesClearedOnStep++
+                console.log(this.linesClearedOnStep);
                 this.map.splice(index, 1)
                 this.map.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             }
         })
+    }
 
+    doScore() {
 
         // Standard score system: (might need to adjust later)
         // 
@@ -115,7 +115,7 @@ export class Tetris {
 
         let scoreThisMove = 0
 
-        switch (linesClearedOnStep) {
+        switch (this.linesClearedOnStep) {
             case 0:
                 return
             case 1:
@@ -137,8 +137,7 @@ export class Tetris {
 
         this.score += scoreThisMove
 
-        console.log(linesClearedOnStep);
-        this.linesCleared += linesClearedOnStep
+        this.linesCleared += this.linesClearedOnStep
 
         if (this.linesCleared > 10 * this.level) {
             this.level++
@@ -150,6 +149,8 @@ export class Tetris {
             console.log("!LOST!");
             return
         }
+
+        this.linesClearedOnStep = 0
 
         if (inputs[4] == 1 && this.checkCollision()) {
             this.rotateLeft();
@@ -172,6 +173,8 @@ export class Tetris {
 
         this.currentPiece.y--
         this.checkCollision()
+
+        this.doScore()
     }
 
     getState(input = false) {
@@ -224,16 +227,18 @@ export class Tetris {
     moveRight() {
         let doMove = true;
 
-        this.currentPiece.currentGrid().forEach(point => {
-            const x = point[0] + this.currentPiece.x
-            const y = point[1] + this.currentPiece.y
-            const neighbor = this.map[y][x + 1]
+        try {
+            this.currentPiece.currentGrid().forEach(point => {
+                const x = point[0] + this.currentPiece.x
+                const y = point[1] + this.currentPiece.y
+                const neighbor = this.map[y][x + 1]
 
-            if (point[0] + this.currentPiece.x >= 9 || neighbor === 1) {
-                doMove = false;
-                return;
-            }
-        });
+                if (point[0] + this.currentPiece.x >= 9 || neighbor === 1) {
+                    doMove = false;
+                    return;
+                }
+            });
+        } catch (_) { }
 
         if (doMove) {
             this.currentPiece.x++;
@@ -243,16 +248,18 @@ export class Tetris {
     moveLeft() {
         let doMove = true;
 
-        this.currentPiece.currentGrid().forEach(point => {
-            const x = point[0] + this.currentPiece.x
-            const y = point[1] + this.currentPiece.y
-            const neighbor = this.map[y][x - 1]
+        try {
+            this.currentPiece.currentGrid().forEach(point => {
+                const x = point[0] + this.currentPiece.x
+                const y = point[1] + this.currentPiece.y
+                const neighbor = this.map[y][x - 1]
 
-            if (x <= 0 || neighbor === 1) {
-                doMove = false;
-                return;
-            }
-        });
+                if (x <= 0 || neighbor === 1) {
+                    doMove = false;
+                    return;
+                }
+            });
+        } catch (_) { }
 
         if (doMove) {
             this.currentPiece.x--;
@@ -331,11 +338,6 @@ export class Tetris {
             } catch (error) { }
         }
 
-        // DEBUG
-        this.projectedMap.reverse().forEach((row, index) => {
-            console.log(" ", row.toString(), "\t", index);
-        })
-        this.projectedMap.reverse()
 
         // Format each row of the map as a string
         this.flippedMap = []
