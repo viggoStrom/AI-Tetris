@@ -1,7 +1,7 @@
 
 import * as tf from '@tensorflow/tfjs';
 import { Tetris } from './src/game.js';
-import { Logger, browserCommunications } from './src/utils.js';
+import { Logger } from './src/utils.js';
 
 
 

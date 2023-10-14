@@ -46,7 +46,8 @@ export class Tetris {
 
     checkLose() {
         if (this.map[19].includes(1)) {
-            console.log("Game Over,", "Top layer:\n", this.map[19].toString().replace(" ", ""));
+            // console.log("Game Over,", "Top layer:\n", this.map[19].toString().replace(" ", ""));
+            console.log("Game Over");
             this.hasLost = true
         }
     }
@@ -88,7 +89,6 @@ export class Tetris {
 
     clearLineCheck() {
         this.map.forEach((row, index) => {
-
             this.rowSum = 0
             row.forEach(cell => {
                 this.rowSum += cell
@@ -183,16 +183,20 @@ export class Tetris {
             this.step(input)
         }
 
-        this.projectedMap = JSON.parse(JSON.stringify(this.map))
+        return [this.getProjectedMap().flat(), this.scoreThisMove]
+    }
+
+    getProjectedMap() {
+        this.projectedMap = JSON.parse(JSON.stringify(this.map));
 
         for (let index = 0; index < 4 /* Change for pentominoes */; index++) {
             try {
-                const x = this.currentPiece.currentGrid()[index][0] + this.currentPiece.x
-                const y = this.currentPiece.currentGrid()[index][1] + this.currentPiece.y
-                this.projectedMap[y][x] = 1
+                const x = this.currentPiece.currentGrid()[index][0] + this.currentPiece.x;
+                const y = this.currentPiece.currentGrid()[index][1] + this.currentPiece.y;
+                this.projectedMap[y][x] = 1;
             } catch (error) { }
         }
-        return [this.projectedMap.flat(), this.scoreThisMove]
+        return this.projectedMap
     }
 
     hardDrop() {

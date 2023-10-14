@@ -64,11 +64,8 @@ export class Logger {
     }
 
     saveRaw(game) {
-        const map = game.map
-        let formattedString = ""
-        map.forEach(row => {
-            formattedString += row.toString().replaceAll("[").replaceAll("]") + ",\n"
-        })
+        const map = game.getProjectedMap()
+        const formattedString = map.flat().join() + ","
 
         fs.promises.appendFile(this.rawReplayDir, formattedString)
     }
