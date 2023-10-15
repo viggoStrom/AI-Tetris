@@ -28,8 +28,6 @@ export class Logger {
 
     saveNetwork(network) {
         fs.promises.writeFile(`${this.dir}/model.json`, JSON.stringify(network))
-
-        const comms = new browserCommunications(this.rawReplayDir)
     }
 
     state(game) {
@@ -72,8 +70,8 @@ export class Logger {
 }
 
 
-export class browserCommunications {
-    constructor(dir) {
+export class BrowserCommunications {
+    constructor(game, logger) {
         this.app = express()
         this.port = 3000
 
@@ -81,28 +79,31 @@ export class browserCommunications {
         this.app.listen(this.port, () => {
             console.log("Listening on port", this.port);
         })
+
+        this.dir = logger.rawReplayDir
+        this.game = game
+    }
+
+    replay() {
         this.app.get('/ask', async (req, res) => {
-            fs.promises.readFile(dir, "utf-8").then(file => {
+            fs.promises.readFile(this.dir, "utf-8").then(file => {
                 console.log("Sent replay to client");
                 res.json(file)
             })
         })
     }
 
-    replay() {
+    send() {
+        this.app.get('/send/:input', async (req, res) => {
+            const input = req.params.input.split(",")
+
+            this.game.step(input)
+            const projectedMap = this.game.getProjectedMap()
+            this.game.projectedMap = projectedMap
+
+            res.json(this.game)
+        })
+
     }
-
-    // send() {
-    //     this.app.get('/send/:input', async (req, res) => {
-    //         const input = req.params.input.split(",")
-
-    //         this.game.step(input)
-    //         const [projectedMap, _] = this.game.getState()
-    //         this.game.projectedMap = projectedMap
-
-    //         res.json(this.game)
-    //     })
-
-    // }
 }
 

@@ -49,12 +49,15 @@ export class Tetris {
             // console.log("Game Over,", "Top layer:\n", this.map[19].toString().replace(" ", ""));
             console.log("Game Over");
             this.hasLost = true
+            return true
         }
     }
 
     checkCollision() {
 
-        this.checkLose()
+        if (this.checkLose()) {
+            return
+        }
 
         const currentGrid = this.currentPiece.currentGrid()
 

@@ -41,11 +41,11 @@
             justify-content: center;
             margin-left: 5vw;
             ">
-            <p>Frame: <span id="frame">0</span></p>
+            <!-- <p>Frame: <span id="frame">0</span></p> -->
             <p>Score: <span id="score">0</span></p>
 
-            <p style="display: none;">Input</p>
-            <div style="display: flex; display: none;">
+            <p>Input</p>
+            <div style="display: flex;">
                 <div onclick="fetchGame([1,0,0,0,0,0])" style="position: relative;"><img src="icons/arrow_back_FILL0_wght400_GRAD0_opsz24.png"      style="pointer-events: none;                        position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="ML"><input style="height: 2.4rem; width: 2.4rem;" type="button" name="" id=""></div>
                 <div onclick="fetchGame([0,1,0,0,0,0])" style="position: relative;"><img src="icons/arrow_back_FILL0_wght400_GRAD0_opsz24.png"      style="pointer-events: none; transform: scaleX(-1); position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="MR"><input style="height: 2.4rem; width: 2.4rem;" type="button" name="" id=""></div>
                 <div onclick="fetchGame([0,0,1,0,0,0])" style="position: relative;"><img src="icons/arrow_drop_down_FILL0_wght400_GRAD0_opsz24.png" style="pointer-events: none;                        position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="SD"><input style="height: 2.4rem; width: 2.4rem;" type="button" name="" id=""></div>
@@ -53,7 +53,7 @@
                 <div onclick="fetchGame([0,0,0,0,1,0])" style="position: relative;"><img src="icons/refresh_FILL0_wght400_GRAD0_opsz24.png"         style="pointer-events: none;                        position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="RR"><input style="height: 2.4rem; width: 2.4rem;" type="button" name="" id=""></div>
                 <div onclick="fetchGame([0,0,0,0,0,1])" style="position: relative;"><img src="icons/refresh_FILL0_wght400_GRAD0_opsz24.png"         style="pointer-events: none; transform: scaleX(-1); position: absolute; left: 0.5rem; top: 0.4rem; color: black; font-size: 1.4rem;" alt="RL"><input style="height: 2.4rem; width: 2.4rem;" type="button" name="" id=""></div>
             </div>
-            <button onclick="submit()" style="display: none; height: 2rem; width: 6vw; font-size: large; font-family: inherit; border-radius: 1vw; margin-top: 1rem;">Step</button>
+            <button onclick="submit()" style="height: 2rem; width: 6vw; font-size: large; font-family: inherit; border-radius: 1vw; margin-top: 1rem;">Step</button>
         </div>
     </div>
 

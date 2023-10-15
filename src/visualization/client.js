@@ -12,7 +12,7 @@ const fetchGame = async (input) => {
                 // Flip and mirror the map
                 const modifiedMap = []
                 for (let index = 0; index < 200; index += 10) {
-                    modifiedMap.push(response.projectedMap.slice(index, index + 10))
+                    modifiedMap.push(response.projectedMap.flat().slice(index, index + 10))
                 }
                 const flatMap = modifiedMap.reverse().flat()
 
@@ -55,7 +55,6 @@ const fetchGame = async (input) => {
         });
     })
 }
-// fetchGame([0, 0, 0, 0, 0, 0])
 
 const submit = () => {
     fetchGame([0, 0, 0, 0, 0, 0])
@@ -144,8 +143,8 @@ const replay = () => {
 
                     map.appendChild(background)
 
-                    const frameSpan = document.getElementById("frame")
-                    frameSpan.innerHTML = index % 200
+                    // const frameSpan = document.getElementById("frame")
+                    // frameSpan.innerHTML = index % 200
                 })
             }
 
@@ -165,4 +164,5 @@ const replay = () => {
     })
 }
 
+// fetchGame([0, 0, 0, 0, 0, 0])
 replay()
