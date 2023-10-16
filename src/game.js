@@ -97,9 +97,7 @@ export class Tetris {
                 this.rowSum += cell
             })
             if (this.rowSum >= 10) {
-                console.log("clear!");
                 this.linesClearedOnStep++
-                console.log(this.linesClearedOnStep);
                 this.map.splice(index, 1)
                 this.map.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
             }
@@ -202,25 +200,13 @@ export class Tetris {
         return this.projectedMap
     }
 
-    hardDrop() {
-        let i = 0
-        const initialY = this.currentPiece.y
-        const columnIndex = this.currentPiece.x
-
-        let depth = 0
-        this.map.forEach(row => {
-            if (row[columnIndex] == 0) {
-                depth += 1
-            } else {
-                return
+    hardDrop() {c
+        if (this.checkCollision()) {
+            const currentPiece = this.currentPiece
+            
+            while (this.checkCollision() && currentPiece == this.currentPiece) {
+                this.currentPiece.y--
             }
-        })
-        depth -= initialY
-
-        // It shoves the next piece down even though thats not desireable
-        while (this.checkCollision() && i < depth) {
-            this.currentPiece.y--;
-            i++
         }
     }
 

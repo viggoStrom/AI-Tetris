@@ -5,110 +5,110 @@ import { Logger, BrowserCommunications } from './src/utils.js';
 
 
 
-class PolicyNetwork {
-    constructor(hiddenLayerSizesOrModel) {
-        if (hiddenLayerSizesOrModel instanceof tf.LayersModel) {
-            this.policyNet = hiddenLayerSizesOrModel;
-        } else {
-            this.createPolicyNetwork(hiddenLayerSizesOrModel);
-        }
+// class PolicyNetwork {
+//     constructor(hiddenLayerSizesOrModel) {
+//         if (hiddenLayerSizesOrModel instanceof tf.LayersModel) {
+//             this.policyNet = hiddenLayerSizesOrModel;
+//         } else {
+//             this.createPolicyNetwork(hiddenLayerSizesOrModel);
+//         }
 
-        this.totalReward = 0
-        this.replayBuffer = []
-    }
+//         this.totalReward = 0
+//         this.replayBuffer = []
+//     }
 
-    createPolicyNetwork(hiddenLayerSizes) {
-        if (!Array.isArray(hiddenLayerSizes)) {
-            hiddenLayerSizes = [hiddenLayerSizes];
-        }
-        this.policyNet = tf.sequential();
-        hiddenLayerSizes.forEach((hiddenLayerSize, i) => {
-            this.policyNet.add(tf.layers.dense({
-                units: hiddenLayerSize,
-                activation: 'elu',
-                inputShape: i === 0 ? [200] : undefined
-            }));
-        });
-        this.policyNet.add(tf.layers.dense({ units: 6 })); // TODO IDK if 6 is appropriate
-    }
+//     createPolicyNetwork(hiddenLayerSizes) {
+//         if (!Array.isArray(hiddenLayerSizes)) {
+//             hiddenLayerSizes = [hiddenLayerSizes];
+//         }
+//         this.policyNet = tf.sequential();
+//         hiddenLayerSizes.forEach((hiddenLayerSize, i) => {
+//             this.policyNet.add(tf.layers.dense({
+//                 units: hiddenLayerSize,
+//                 activation: 'elu',
+//                 inputShape: i === 0 ? [200] : undefined
+//             }));
+//         });
+//         this.policyNet.add(tf.layers.dense({ units: 6 })); // TODO IDK if 6 is appropriate
+//     }
 
-    train(game, parameters) {
-        // Training code goes here
-        const action = [0, 0, 0, 0, 0, 0]
-        const [state, _] = game.getState()
+//     train(game, parameters) {
+//         // Training code goes here
+//         const action = [0, 0, 0, 0, 0, 0]
+//         const [state, _] = game.getState()
 
-        while (!game.hasLost) {
+//         while (!game.hasLost) {
 
-            // Set action
-            for (let index = 0; index < action.length; index++) {
-                if (Math.random() < parameters.explorationRate) {
-                    // console.log("random");
-                    action[index] = Math.round(Math.random())
-                } else {
-                    // console.log("qValue");
-                    const qValues = this.policyNet.predict(tf.tensor([state]))
-                    action[index] = tf.argMax(qValues).dataSync()[0]
-                }
-            }
+//             // Set action
+//             for (let index = 0; index < action.length; index++) {
+//                 if (Math.random() < parameters.explorationRate) {
+//                     // console.log("random");
+//                     action[index] = Math.round(Math.random())
+//                 } else {
+//                     // console.log("qValue");
+//                     const qValues = this.policyNet.predict(tf.tensor([state]))
+//                     action[index] = tf.argMax(qValues).dataSync()[0]
+//                 }
+//             }
 
-            const [nextState, score] = game.getState(action)
-            this.totalReward += score
+//             const [nextState, score] = game.getState(action)
+//             this.totalReward += score
 
-            // DEBUG
-            logger.state(game)
+//             // DEBUG
+//             logger.state(game)
 
-            this.replayBuffer.push({ state, action, score, nextState })
-
-
-            if (this.replayBuffer.length >= parameters.batchSize) {
-                const batch = randomSample(this.replayBuffer, parameters.batchSize);
-                // trainDQN(model, targetModel, batch, discountFactor);
-            }
-        }
-    }
-
-    getLogitsAndActions(inputs) {
-        // Implementation of getLogitsAndActions
-    }
-
-    // Other methods go here
-}
-
-const logger = new Logger()
-
-// Instantiate the PolicyNetwork
-const hiddenLayerSizes = [64, 32]; // Example: Two hidden layers with 64 and 32 units. Try 133 ish 
-const policyNetwork = new PolicyNetwork(hiddenLayerSizes);
-
-// Define training parameters
-const parameters = {
-    optimizer: tf.train.adam(0.001),
-    discountRate: 0.95,
-    numGames: 1000,
-    maxStepsPerGame: 1000,
-    learningRate: 0.00,
-    explorationRate: 0.1,
-    batchSize: 3,
-}
-
-// Create and configure the cart-pole system (implementation not provided)
-const game = new Tetris();
-
-// Train the policy network
-policyNetwork.train(game, parameters);
+//             this.replayBuffer.push({ state, action, score, nextState })
 
 
-logger.saveNetwork(policyNetwork)
-const comms = new BrowserCommunications(game, logger)
-comms.replay()
+//             if (this.replayBuffer.length >= parameters.batchSize) {
+//                 const batch = randomSample(this.replayBuffer, parameters.batchSize);
+//                 // trainDQN(model, targetModel, batch, discountFactor);
+//             }
+//         }
+//     }
+
+//     getLogitsAndActions(inputs) {
+//         // Implementation of getLogitsAndActions
+//     }
+
+//     // Other methods go here
+// }
+
+// const logger = new Logger()
+
+// // Instantiate the PolicyNetwork
+// const hiddenLayerSizes = [64, 32]; // Example: Two hidden layers with 64 and 32 units. Try 133 ish 
+// const policyNetwork = new PolicyNetwork(hiddenLayerSizes);
+
+// // Define training parameters
+// const parameters = {
+//     optimizer: tf.train.adam(0.001),
+//     discountRate: 0.95,
+//     numGames: 1000,
+//     maxStepsPerGame: 1000,
+//     learningRate: 0.00,
+//     explorationRate: 0.1,
+//     batchSize: 3,
+// }
+
+// // Create and configure the cart-pole system (implementation not provided)
+// const game = new Tetris();
+
+// // Train the policy network
+// policyNetwork.train(game, parameters);
 
 
-// const testGame = new Tetris()
-// const testLogger = new Logger()
+// logger.saveNetwork(policyNetwork)
+// const comms = new BrowserCommunications(game, logger)
+// comms.replay()
 
-// const comms = new BrowserCommunications(testGame, testLogger)
 
-// comms.send()
+const testGame = new Tetris()
+const testLogger = new Logger()
+
+const comms = new BrowserCommunications(testGame, testLogger)
+
+comms.send()
 
 // import * as tf from '@tensorflow/tfjs';
 // import { Tetris } from './src/game.js';
