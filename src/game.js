@@ -1,6 +1,5 @@
 
 import { I, O, L, J, S, Z, T } from "./pieces.js"
-import * as tf from "@tensorflow/tfjs"
 import { random } from "./utils.js";
 
 
@@ -25,7 +24,6 @@ export class Tetris {
         this.currentPiece = this.generateRandomPiece()
         this.nextPiece = this.generateRandomPiece()
         this.score = 0
-        this.scoreThisMove = 0
         this.level = 1
         this.combo = 0
         this.linesCleared = 0
@@ -34,7 +32,7 @@ export class Tetris {
 
     generateRandomPiece() {
         const pieces = [I, O, L, J, S, Z, T]
-        const [randomIndex, seed] = random(7, true)
+        const randomIndex = random(7, false)
         const piece = new pieces[parseInt(randomIndex)]
         return piece
     }
@@ -105,7 +103,6 @@ export class Tetris {
     }
 
     doScore() {
-
         // Standard score system: (might need to adjust later)
         // 
         // Single row score = 100 * level 
@@ -118,7 +115,7 @@ export class Tetris {
 
         switch (this.linesClearedOnStep) {
             case 0:
-                return
+                break;
             case 1:
                 scoreThisMove += 100 * this.level
                 break;
@@ -136,13 +133,35 @@ export class Tetris {
         }
         // Combo will come later
 
-        this.score += scoreThisMove
-
+        this.score += scoreThisMove // the ingame score. Wont be sent to the network.
         this.linesCleared += this.linesClearedOnStep
 
         if (this.linesCleared > 10 * this.level) {
             this.level++
         }
+
+        // META SCORING
+        const scoreGrade = (x) => { return parseInt(0.0143817 * x ** 3) }
+        const mapRows = this.map.length - 1
+        for (let rowIndex = 0; rowIndex < mapRows; rowIndex++) {
+            try {
+                const upperRow = this.map[rowIndex]
+                const lowerRow = this.map[rowIndex + 1]
+
+                for (let index = 0; index < 10; index++) {
+                    if (upperRow[index] === 0 && lowerRow[index] === 1) {
+                        scoreThisMove -= 1
+                    }
+                }
+
+                let upperRowSum = 0
+                upperRow.forEach((cell) => { upperRowSum += cell })
+                scoreThisMove += scoreGrade(upperRowSum)
+            } catch (_) { }
+
+        }
+
+        return scoreThisMove
     }
 
     step(inputs) {
@@ -175,16 +194,11 @@ export class Tetris {
         this.currentPiece.y--
         this.checkCollision()
 
-        this.doScore()
+        return this.doScore()
     }
 
-    getState(input = false) {
-
-        if (input) {
-            this.step(input)
-        }
-
-        return [this.getProjectedMap().flat(), this.scoreThisMove]
+    getState() {
+        return [this.getProjectedMap(), this.currentPiece.currentGrid().flat(), this.nextPiece.currentGrid().flat()]
     }
 
     getProjectedMap() {
@@ -197,13 +211,13 @@ export class Tetris {
                 this.projectedMap[y][x] = 1;
             } catch (error) { }
         }
-        return this.projectedMap
+        return this.projectedMap.flat()
     }
 
-    hardDrop() {c
+    hardDrop() {
         if (this.checkCollision()) {
             const currentPiece = this.currentPiece
-            
+
             while (this.checkCollision() && currentPiece == this.currentPiece) {
                 this.currentPiece.y--
             }

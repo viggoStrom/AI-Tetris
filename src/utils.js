@@ -16,18 +16,22 @@ export const random = (max = 1, returnSeed = false, parseSeed = 0) => {
 
 export class Logger {
     constructor() {
-        this.dir = `./logs/${Date.now()}`
+        this.id = Date.now()
+        this.dir = `./logs/${this.id}`
         fs.promises.mkdir(this.dir)
 
         this.gameReplayDir = `${this.dir}/replay.txt`
         fs.promises.writeFile(this.gameReplayDir, "")
 
-        this.rawReplayDir = `${this.dir}/rawReplay.csv`
-        fs.promises.writeFile(this.rawReplayDir, "")
+        this.rawReplayDir = `${this.dir}/rawReplay`
+        fs.promises.mkdir(this.rawReplayDir)
     }
 
-    saveNetwork(network) {
+    saveModel(network) {
         fs.promises.writeFile(`${this.dir}/model.json`, JSON.stringify(network))
+    }
+    loadModel(id) {
+        return fs.promises.readFile(`./logs/${id}/model.json`).then(result => { return JSON.parse(result) })
     }
 
     state(game) {
@@ -61,11 +65,10 @@ export class Logger {
         this.saveRaw(game)
     }
 
-    saveRaw(game) {
-        const map = game.getProjectedMap()
-        const formattedString = map.flat().join() + ","
-
-        fs.promises.appendFile(this.rawReplayDir, formattedString)
+    saveRaw(game, episode, totalReward) {
+        const map = game.getState()[0]
+        const formattedString = `<<<HEAD: Episode ${episode + 1}, Total Reward: ${totalReward}>>>,` + map.flat().join() + ","
+        fs.promises.appendFile(`${this.rawReplayDir}/${episode + 1}.csv`, formattedString)
     }
 }
 
