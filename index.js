@@ -13,14 +13,14 @@ model.add(tf.layers.dense({ units: 140, activation: "relu" }))
 model.add(tf.layers.dense({ units: 70, activation: "relu" }))
 model.add(tf.layers.dense({ units: 6, activation: "relu" }))
 
-console.log(model.predict(tf.reshape(testState, [3, 200])));
+console.log(model.predict(tf.reshape(testState, [3, 200])).arraySync()[0]);
 
 const params = {}
 params.learningRate = 0.001
 params.gamma = 0.9
-params.epsilon = 0.1
+params.epsilon = 0.2
 params.optimizer = tf.train.sgd(params.learningRate)
-params.numberOfEpisodes = 3
+params.numberOfEpisodes = 10
 
 const getMove = (state) => {
     const prediction = model.predict(
@@ -48,12 +48,13 @@ const qLearning = (state, action, reward, nextState) => {
     const c = tf.scalar(Math.random()).variable();
 
     // y = a * x^2 + b * x + c.
-    const f = x => a.mul(x.square()).add(b.mul(x)).add(c);
+    const f = (x) => a.mul(x.square()).add(b.mul(x)).add(c);
     const loss = (pred, label) => pred.sub(label).square().mean();
 
     // Train the model.
     for (let i = 0; i < 10; i++) {
         params.optimizer.minimize(() => loss(f(xs), ys));
+        model.compile({ optimizer: params.optimizer, loss: "meanSquaredError" })
     }
 
 };
@@ -77,15 +78,15 @@ for (let episode = 0; episode < params.numberOfEpisodes; episode++) {
             action = getMove(state)
         }
 
-        const reward = game.step(action)
+        const reward = game.step(action) - (game.hasLost ? 5000 : 0)
         const nextState = game.getState()
-        qLearning(state, action, game.hasLost ? reward - 1000 : reward, nextState)
+        qLearning(state, action, reward, nextState)
         totalReward += reward
         state = nextState
 
-        if (episode === params.numberOfEpisodes - 1) {
-            game.display()
-        }
+        // if (episode === params.numberOfEpisodes - 1) {
+        //     game.display()
+        // }
     }
 
     episodeSummery.push([`Episode: ${episode + 1}, Total Reward: ${totalReward}`])
@@ -99,8 +100,8 @@ episodeSummery.forEach(episode => {
 
 logger.saveModel(model)
 
-console.log(model.predict(tf.reshape(testState, [3, 200])));
+model.compile({optimizer: params.optimizer, loss: "meanSquaredError"})
+
+console.log(model.predict(tf.reshape(testState, [3, 200])).arraySync()[0]);
 
 // model = await logger.loadModel(logger.id)
-
-console.log(model);
