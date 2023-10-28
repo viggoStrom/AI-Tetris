@@ -115,7 +115,42 @@ document.addEventListener("keydown", keypress)
 const replay = () => {
     fetch(`http://localhost:3000/ask/`).then(response => {
         response.text().then(response => {
-            const flatMap = response.replaceAll("\"", "").split(",")
+            const allMovesArray = response.replaceAll("\"", "").split(",")
+            console.log(allMovesArray);
+
+            const frames = []
+            let totalReward = 0
+
+            const allMovesArrayLength = allMovesArray.length
+            for (let index = 0; index < allMovesArrayLength; index++) {
+
+                const frame = {
+                    mapData: [],
+                    reward: 0
+                }
+
+                const element = parseInt(allMovesArray[index])
+
+                switch (index % 201) {
+                    case 0:
+                        frame.reward = element
+                        totalReward += element
+                        break;
+
+                    default:
+                        frame.mapData.push(element)
+                        break;
+                }
+
+                if (index % 202) {
+                    console.log(frame);
+                    frames.push(frame)
+                    frames.mapData = []
+                    frames.reward = 0
+                }
+            }
+
+            console.log(JSON.stringify(frames));
 
             const scoreSpan = document.getElementById("score")
             scoreSpan.innerHTML = score
@@ -149,17 +184,13 @@ const replay = () => {
             }
 
 
-            for (let index = 0; index < flatMap.length; index += 200) {
-
-                const frameData = []
-                for (let localIndex = index; localIndex < index + 200; localIndex++) {
-                    frameData.push(flatMap[localIndex])
-                }
+            frames.forEach(frame => {
+                const frameData = frame.mapData
 
                 setTimeout(() => {
                     oneFrame(frameData.reverse(), index)
-                }, 500 + index );
-            }
+                }, 500 + index);
+            })
         });
     })
 }

@@ -67,7 +67,7 @@ export class Logger {
 
     saveRaw(game, episode, totalReward) {
         const map = game.getState()[0]
-        const formattedString = `<<<HEAD: Episode ${episode + 1}, Total Reward: ${totalReward}>>>,` + map.flat().join() + ","
+        const formattedString = totalReward + ", " + map.flat().join() + ","
         fs.promises.appendFile(`${this.rawReplayDir}/${episode + 1}.csv`, formattedString)
     }
 }
@@ -87,9 +87,9 @@ export class BrowserCommunications {
         this.game = game
     }
 
-    replay() {
+    replay(dir) {
         this.app.get('/ask', async (req, res) => {
-            fs.promises.readFile(this.dir, "utf-8").then(file => {
+            fs.promises.readFile(dir, "utf-8").then(file => {
                 console.log("Sent replay to client");
                 res.json(file)
             })

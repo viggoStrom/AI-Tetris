@@ -13,14 +13,17 @@ model.add(tf.layers.dense({ units: 140, activation: "relu" }))
 model.add(tf.layers.dense({ units: 70, activation: "relu" }))
 model.add(tf.layers.dense({ units: 6, activation: "relu" }))
 
-console.log(model.predict(tf.reshape(testState, [3, 200])).arraySync()[0]);
+const testStateResult = model.predict(tf.reshape(testState, [3, 200])).arraySync()[0]
+console.log(testStateResult);
 
 const params = {}
 params.learningRate = 0.001
 params.gamma = 0.9
 params.epsilon = 0.2
 params.optimizer = tf.train.sgd(params.learningRate)
-params.numberOfEpisodes = 10
+params.numberOfEpisodes = 5
+params.batchSize = 32
+
 
 const getMove = (state) => {
     const prediction = model.predict(
@@ -30,78 +33,107 @@ const getMove = (state) => {
     output[tf.argMax(prediction).dataSync()[0]] = 1
     return output
 }
-const qLearning = (state, action, reward, nextState) => {
-    // Calculate the target Q-value
-    const target = reward + params.gamma * tf.argMax(getMove(nextState)).dataSync()[0];
+const qLearning = (batch, hasLost) => {
+    const states = []
+    const targetQs = []
 
-    // Calculate the predicted Q-value
-    const predicted = getMove(state)
+    batch.forEach(experience => {
+        const { state, action, reward, nextState } = experience
+        const qValues = tf.reshape(model.predict(state), [3, 200])
 
-    // Update the Q-value for the chosen action
-    predicted[action.indexOf(1)] = target;
-
-    const xs = tf.tensor1d([0, 1, 2, 3]);
-    const ys = tf.tensor1d([1.1, 5.9, 16.8, 33.9]);
-
-    const a = tf.scalar(Math.random()).variable();
-    const b = tf.scalar(Math.random()).variable();
-    const c = tf.scalar(Math.random()).variable();
-
-    // y = a * x^2 + b * x + c.
-    const f = (x) => a.mul(x.square()).add(b.mul(x)).add(c);
-    const loss = (pred, label) => pred.sub(label).square().mean();
-
-    // Train the model.
-    for (let i = 0; i < 10; i++) {
-        params.optimizer.minimize(() => loss(f(xs), ys));
-        model.compile({ optimizer: params.optimizer, loss: "meanSquaredError" })
-    }
-
-};
-
-
-const episodeSummery = []
-
-for (let episode = 0; episode < params.numberOfEpisodes; episode++) {
-    const game = new Tetris()
-    let state = tf.reshape(game.getState(), [3, 200])
-    let totalReward = 0
-
-    while (!game.hasLost) {
-        logger.saveRaw(game, episode, totalReward)
-
-        let action = [0, 0, 0, 0, 0, 0]
-
-        if (Math.random() < params.epsilon) {
-            action[Math.floor(Math.random() * 6)]
+        if (!hasLost) {
+            qValues.dataSync()[action] = reward
         } else {
-            action = getMove(state)
+            const nextQValues = tf.reshape(model.predict(nextState), [3, 200])
+            qValues.dataSync()[action] = reward + params.gamma * tf.argMax(getMove(nextState)).dataSync()[0];
         }
 
-        const reward = game.step(action) - (game.hasLost ? 5000 : 0)
-        const nextState = game.getState()
-        qLearning(state, action, reward, nextState)
-        totalReward += reward
-        state = nextState
+        states.push(state)
+        targetQs.push(qValues)
+    })
+    model.compile({ optimizer: params.optimizer, loss: "meanSquaredError" })
+    model.fit(states, tf.concat(qValues),
+        {
+            batchSize: batch.length,
+            epochs: 1
+        }
+    )S
+};
+const randomSample = (buffer) => {
+    const sample = []
 
-        // if (episode === params.numberOfEpisodes - 1) {
-        //     game.display()
-        // }
+    for (let index = 0; index < params.batchSize; index++) {
+        const bufferLength = buffer.length
+        const index = Math.floor(Math.random() * bufferLength)
+        sample.push(buffer[index])
     }
 
-    episodeSummery.push([`Episode: ${episode + 1}, Total Reward: ${totalReward}`])
-    console.log("Episode", episode + 1, ",", "Total Reward:", totalReward);
+    return sample
 }
 
-console.log("");
-episodeSummery.forEach(episode => {
-    console.log(episode);
+const run = async () => {
+    const episodeSummery = []
+    const replayBuffer = []
+
+    for (let episode = 0; episode < params.numberOfEpisodes; episode++) {
+        const game = new Tetris()
+        let state = tf.reshape(game.getState(), [3, 200])
+        let totalReward = 0
+
+        while (!game.hasLost) {
+            logger.saveRaw(game, episode, totalReward)
+
+            model.compile({ optimizer: params.optimizer, loss: "meanSquaredError" })
+
+            let action = [0, 0, 0, 0, 0, 0]
+
+            if (Math.random() < params.epsilon) {
+                action[Math.floor(Math.random() * 6)]
+            } else {
+                action = getMove(state)
+            }
+
+            const reward = game.step(action) - (game.hasLost ? 5000 : 0)
+            const nextState = game.getState()
+            totalReward += reward
+            state = nextState
+
+            replayBuffer.push({ state, action, reward, nextState })
+
+            if (replayBuffer > params.batchSize) {
+                const batch = randomSample(replayBuffer)
+                qLearning(batch, game.hasLost)
+            }
+
+            // if (episode === params.numberOfEpisodes - 1) {
+            //     game.display()
+            // }
+        }
+
+        episodeSummery.push([`Episode: ${episode + 1}, Total Reward: ${totalReward}`])
+        console.log("Episode", episode + 1, ",", "Total Reward:", totalReward);
+    }
+
+    console.log("");
+    episodeSummery.forEach(episode => {
+        console.log(episode);
+    })
+
+    logger.saveModel(model)
+}
+
+run()
+
+
+const testStateResultAfter = model.predict(tf.reshape(testState, [3, 200])).arraySync()[0]
+const diffArray = []
+testStateResult.forEach((number, index) => {
+    diffArray.push(testStateResult[index] - testStateResultAfter[index])
 })
-
-logger.saveModel(model)
-
-model.compile({optimizer: params.optimizer, loss: "meanSquaredError"})
-
-console.log(model.predict(tf.reshape(testState, [3, 200])).arraySync()[0]);
+console.log("");
+console.log("Diffrence:", diffArray);
 
 // model = await logger.loadModel(logger.id)
+
+// const comms = new BrowserCommunications(new Tetris(), logger)
+// comms.replay("logs/1698340167068/rawReplay/2.csv")
