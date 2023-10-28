@@ -7,22 +7,24 @@ const testState = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 const logger = new Logger()
 
-let model = tf.sequential()
-model.add(tf.layers.dense({ units: 217, batchSize: 10, batchInputShape: [3, 200] }))
-model.add(tf.layers.dense({ units: 140, activation: "relu" }))
-model.add(tf.layers.dense({ units: 70, activation: "relu" }))
-model.add(tf.layers.dense({ units: 6, activation: "relu" }))
-
-const testStateResult = model.predict(tf.reshape(testState, [3, 200])).arraySync()[0]
-console.log(testStateResult);
-
 const params = {}
 params.learningRate = 0.001
 params.gamma = 0.9
 params.epsilon = 0.2
 params.optimizer = tf.train.sgd(params.learningRate)
-params.numberOfEpisodes = 5
+params.numberOfEpisodes = 100
 params.batchSize = 32
+
+const model = tf.sequential()
+model.add(tf.layers.dense({ units: 217, batchSize: 10, batchInputShape: [3, 200] }))
+model.add(tf.layers.dense({ units: 140, activation: "relu" }))
+model.add(tf.layers.dense({ units: 70, activation: "relu" }))
+model.add(tf.layers.dense({ units: 6, activation: "relu" }))
+
+model.compile({ optimizer: params.optimizer, loss: "meanSquaredError" })
+
+const testStateResult = model.predict(tf.reshape(testState, [3, 200])).arraySync()[0]
+console.log(testStateResult);
 
 
 const getMove = (state) => {
@@ -51,13 +53,13 @@ const qLearning = (batch, hasLost) => {
         states.push(state)
         targetQs.push(qValues)
     })
-    model.compile({ optimizer: params.optimizer, loss: "meanSquaredError" })
+
     model.fit(states, tf.concat(qValues),
         {
             batchSize: batch.length,
-            epochs: 1
+            epochs: 10
         }
-    )S
+    )
 };
 const randomSample = (buffer) => {
     const sample = []
@@ -81,7 +83,7 @@ const run = async () => {
         let totalReward = 0
 
         while (!game.hasLost) {
-            logger.saveRaw(game, episode, totalReward)
+            // logger.saveRaw(game, episode, totalReward)
 
             model.compile({ optimizer: params.optimizer, loss: "meanSquaredError" })
 
@@ -119,7 +121,7 @@ const run = async () => {
         console.log(episode);
     })
 
-    logger.saveModel(model)
+    // logger.saveModel(model)
 }
 
 run()
